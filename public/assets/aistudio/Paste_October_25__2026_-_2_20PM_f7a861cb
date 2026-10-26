@@ -1,0 +1,791 @@
+# Build a Premium Multi-User Habit Tracker Web Application
+
+## 1. Your Role
+
+Act as a senior full-stack engineer, product designer, database architect, security engineer, and QA specialist.
+
+Build a complete, production-minded, multi-user Habit Tracker web application in Replit, inspired by the structure and tracking logic of my uploaded `Habit Tracker.xlsx` spreadsheet.
+
+Do not create a static prototype or a frontend-only mockup. Implement a functional application with persistent database storage, secure authentication, accurate calculations, responsive UI, validation, and automated tests.
+
+Start by inspecting the existing Replit project and any uploaded spreadsheet available in the workspace. Reuse compatible existing code when appropriate. If the spreadsheet is not accessible to the Agent, use the requirements below and keep all initial habits configurable.
+
+## 2. Product Vision
+
+Create an advanced personal productivity platform where multiple users can create accounts, manage their habits, track daily completion, maintain streaks, review performance, set goals, receive reminders, and analyze their long-term consistency.
+
+Each user must have a completely separate private workspace. Users must never be able to access another user's habits, logs, goals, reports, or personal settings.
+
+The application should feel like a premium SaaS product rather than a basic checklist.
+
+Product name: HabitFlow
+
+Make the product name configurable so it can be changed later.
+
+## 3. Required Technology Stack
+
+Use a Replit-compatible full-stack architecture:
+
+- Frontend: React, TypeScript, and Vite.
+- Styling: Tailwind CSS.
+- UI components: accessible, reusable components; use a consistent component library if compatible with the existing project.
+- Backend: Node.js and Express with TypeScript.
+- Database: PostgreSQL.
+- ORM: Drizzle ORM with versioned database migrations.
+- Authentication: secure, server-managed sessions using an established authentication implementation.
+- Password storage: strong password hashing using a maintained library such as Argon2id or bcrypt.
+- Charts: Recharts.
+- Validation: Zod or an equivalent schema validation library.
+- Testing: Vitest and React Testing Library; use an API integration test framework compatible with the project.
+- Icons: Lucide.
+- Date handling: a reliable date utility library and explicit IANA timezone support.
+
+Prefer a single coherent TypeScript project with clearly separated frontend, backend, shared schemas, and database modules.
+
+Use Replit-supported PostgreSQL and deployment facilities. Read credentials from environment variables or Replit Secrets. Never hardcode secrets or commit them to source control.
+
+Before adding a dependency, check whether the existing project already provides equivalent functionality.
+
+## 4. Visual Design System
+
+Design direction: Dark Luxury + Neon Lime.
+
+The interface should look polished, modern, premium, calm, and highly usable.
+
+### Color palette
+
+- Main background: #0B0D0B
+- Sidebar and elevated panels: #121512
+- Secondary surface: #191D18
+- Primary accent: #C6FF00
+- Primary text: #F5F7F2
+- Secondary text: #9BA397
+- Borders: subtle dark gray-green
+- Success, warning, and error states: accessible semantic colors that remain readable on dark backgrounds.
+
+Use neon lime strategically for primary actions, completed habits, progress indicators, and selected states. Avoid overwhelming the screen with bright green.
+
+### Design rules
+
+- Premium dark dashboard with a carefully aligned grid.
+- Clear typography and strong information hierarchy.
+- Subtle borders, restrained shadows, rounded cards, and consistent spacing.
+- Elegant progress rings, progress bars, charts, and calendar heatmaps.
+- Smooth but restrained micro-interactions.
+- Meaningful loading, empty, success, and error states.
+- No excessive gradients, unnecessary glassmorphism, oversized headings, or decorative elements that reduce usability.
+- No fake customer testimonials, invented performance claims, or fabricated social proof.
+- Use Lucide icons consistently.
+- Include accessible focus indicators, keyboard navigation, semantic HTML, and sufficient contrast.
+
+### Responsive behavior
+
+Desktop:
+- Collapsible left sidebar.
+- Spacious dashboard with a responsive card grid.
+- Calendar and habit tracking views optimized for wide screens.
+
+Tablet:
+- Compact sidebar or navigation drawer.
+- Adaptive card and chart layouts.
+
+Mobile:
+- Touch-friendly habit checkboxes.
+- Compact top bar and mobile navigation.
+- Responsive daily checklist and calendar.
+- No horizontal overflow.
+- Important actions accessible without excessive scrolling.
+
+## 5. Application Navigation
+
+Implement the following routes and navigation items:
+
+1. Dashboard
+2. Daily Habits
+3. Calendar
+4. Analytics
+5. Goals
+6. Weekly Review
+7. Reports & Export
+8. Notifications
+9. Settings
+10. Profile
+
+Authentication routes:
+- Sign up
+- Login
+- Forgot password
+- Reset password
+- Logout
+
+Protect all private routes and API endpoints.
+
+Create a polished onboarding flow for new users after registration.
+
+## 6. Dashboard
+
+Build a data-driven dashboard that updates when habits are completed, edited, or removed.
+
+### Summary cards
+
+- Today's completion percentage.
+- Completed habits.
+- Remaining scheduled habits.
+- Missed habits for a selected historical date, where applicable.
+- Current streak.
+- Longest streak.
+- Weekly consistency.
+- Monthly completion rate.
+
+Do not confuse today's incomplete habits with missed habits. A habit that has not reached its scheduled completion deadline should remain pending.
+
+### Main dashboard sections
+
+A. Today's Progress:
+- Large circular progress indicator.
+- Completed / scheduled habit count.
+- Encouraging contextual message based on actual progress.
+
+B. Today's Habits:
+- Habit name and category.
+- Optional scheduled time.
+- Completion control.
+- Optional target progress.
+- Priority indicator.
+- Quick edit and notes actions.
+
+C. Daily Overview:
+- A compact seven-day completion summary.
+- Date navigation.
+- Daily completion trend.
+
+D. Top Daily Habits:
+- Rank habits by completion rate over a clearly labeled period.
+- Show actual completed and eligible scheduled occurrences.
+- Handle ties consistently.
+- Clearly distinguish low sample sizes.
+
+E. Progress & Streaks:
+- Current streak.
+- Longest streak.
+- Weekly and monthly completion.
+- Habit-specific statistics.
+
+F. Weekly and Monthly Insights:
+- Best-performing habit.
+- Habit requiring attention.
+- Comparison with the previous equivalent period.
+- Actionable, nonjudgmental observations based on real user data.
+
+Do not display fabricated analytics. For new users with insufficient history, show a helpful empty state.
+
+## 7. Habit Management
+
+Users must be able to create, view, edit, complete, archive, restore, and delete their own habits.
+
+### Habit fields
+
+- Habit name (required).
+- Description (optional).
+- Category.
+- Icon.
+- Accent color selected from an accessible palette.
+- Start date.
+- Optional end date.
+- Schedule type.
+- Selected weekdays for custom weekly schedules.
+- Daily or weekly target.
+- Target unit, when applicable.
+- Optional reminder time.
+- Priority.
+- Optional completion deadline.
+- Active, archived, or deleted status.
+
+Suggested categories:
+- Morning Routine
+- Health & Fitness
+- Work & Productivity
+- Learning
+- Personal Development
+- Family & Relationships
+- Sleep & Recovery
+- Finance
+- Custom
+
+Support at least 50 active habits per user without hardcoded UI limits. Keep the data model extensible.
+
+### Habit types
+
+Support at minimum:
+
+1. Boolean habits: complete or incomplete.
+2. Count-based habits: for example, drink 8 glasses of water.
+3. Duration-based habits: for example, exercise for 30 minutes.
+
+Each habit type must have an appropriate input and completion rule.
+
+For count-based habits, track the numeric value against its target. For duration-based habits, track completed duration against the configured target.
+
+Avoid treating a partially completed numeric target as fully complete unless the user explicitly configures that behavior.
+
+### Habit list interactions
+
+- Complete or undo a habit.
+- Edit details in an accessible dialog or dedicated page.
+- Add optional daily notes.
+- Filter by category, status, and schedule.
+- Search by habit name.
+- Sort by custom order, priority, or name.
+- Archive a habit without destroying historical data.
+- Confirm destructive actions.
+- Show a useful undo option for reversible actions when practical.
+
+Persist changes in PostgreSQL, not just in browser state.
+
+## 8. Daily Tracking and Calendar
+
+Reproduce the spreadsheet's core experience: habits listed against dates, with clear completion states.
+
+Implement:
+- Daily checklist view.
+- Monthly calendar.
+- Date picker.
+- Previous day and next day controls.
+- Today shortcut.
+- Month and year navigation.
+- Historical completion review.
+- Weekly groupings equivalent to Week #1 through Week #5.
+- Responsive calendar layout.
+- Calendar heatmap based on actual completion data.
+
+Calculate the number of days in each month dynamically. Handle leap years correctly.
+
+Define week boundaries explicitly and use the user's configured week-start preference. Label partial weeks consistently so the results remain understandable.
+
+When a user changes the selected date, load the correct scheduled habits and their saved entries for that local date.
+
+Do not generate permanent daily log records for every possible habit/date combination unnecessarily. Calculate eligible occurrences and load saved entries efficiently.
+
+Historical dates must remain viewable even if the corresponding habit is now archived.
+
+### Editing historical entries
+
+Users may edit their own historical entries, subject to the application's configured policy.
+
+When historical data changes:
+- Recalculate all affected statistics.
+- Update current and longest streaks.
+- Refresh weekly and monthly analytics.
+- Preserve the original habit configuration and applicable historical schedule rules.
+- Avoid changing another user's data.
+
+## 9. Calculation Rules
+
+Create a centralized, well-tested calculation service. Do not duplicate streak or completion logic across React components.
+
+### A. Scheduled occurrences
+
+Only count a habit on dates when it is scheduled and active according to its applicable start/end dates and schedule rules.
+
+A day on which a habit was not scheduled must not count as a failure.
+
+Define how archived habits affect historical statistics and keep that behavior consistent.
+
+### B. Daily completion rate
+
+For Boolean habits:
+
+Daily completion rate = completed eligible Boolean habits / eligible Boolean habits × 100.
+
+For count-based and duration-based habits, calculate target attainment separately and report it clearly. If combining different habit types into an overall score, use a documented, configurable weighting policy and do not obscure the raw completion counts.
+
+If there are no eligible habits, show an empty state rather than dividing by zero.
+
+Round percentages consistently for display while retaining adequate precision internally.
+
+### C. Weekly and monthly completion
+
+Calculate metrics using eligible scheduled occurrences in the selected period, not merely the total number of habits in the user's library.
+
+Show completed, pending, and missed occurrences separately where the selected date range and deadlines make those classifications meaningful.
+
+Exclude future scheduled occurrences from completed-versus-missed performance calculations until they become eligible.
+
+### D. Streaks
+
+Implement and test:
+- Current streak.
+- Longest streak.
+- Habit-specific streaks.
+- Overall consistency streak, with an explicitly documented rule.
+
+Use each habit's schedule to determine whether a day qualifies as a required occurrence.
+
+Unscheduled days must not break a scheduled-habit streak.
+
+Do not silently count future dates or pending occurrences as failures.
+
+For a daily habit, define the streak relative to the user's local date and the application's completion policy.
+
+For weekly or custom-schedule habits, use scheduled occurrences and a consistent streak rule. Document the rule in the UI or help section.
+
+Historical edits must trigger accurate recalculation.
+
+### E. Targets and goals
+
+Support daily targets, weekly targets, and configurable numeric targets.
+
+Show target attainment and completion separately when those concepts differ.
+
+Do not award achievements or completion statuses based solely on optimistic frontend state.
+
+### F. Timezones and daylight saving
+
+Store timestamps in a consistent UTC representation and store each user's IANA timezone, such as Asia/Dhaka.
+
+Use the user's local calendar date for daily tracking, reminders, and streak boundaries.
+
+Handle timezone changes and daylight-saving transitions safely. Do not rely on the server's local timezone.
+
+## 10. Goals and Progress
+
+Implement:
+- Daily completion goals.
+- Weekly consistency goals.
+- Monthly habit goals.
+- Per-habit targets.
+- Goal start and end dates.
+- Goal progress indicators.
+- Completed and active goals.
+- Historical goal performance.
+
+Let users configure their own targets.
+
+Do not promise guaranteed behavior changes or use punitive language when users miss goals.
+
+## 11. Analytics and Reports
+
+Create a dedicated Analytics page with filters for:
+- Last 7 days.
+- Last 30 days.
+- Current week.
+- Previous week.
+- Current month.
+- Previous month.
+- Custom date range.
+
+Include:
+- Daily completion line chart.
+- Weekly comparison chart.
+- Monthly completion trend.
+- Habit-by-habit completion table.
+- Category-level performance.
+- Current and longest streak comparison.
+- Calendar heatmap.
+- Most consistent habits.
+- Habits with the most missed scheduled occurrences.
+
+Every chart must use real database data and clearly label the date range, denominator, and metric being shown.
+
+Provide empty states when no historical data exists.
+
+### CSV export
+
+Allow users to export their own habit definitions, daily logs, and reports.
+
+- Generate valid CSV files.
+- Use predictable column names and date formats.
+- Escape CSV fields correctly.
+- Export only data the authenticated user is authorized to access.
+- Respect the selected date range and filters.
+- Include clear headings for counts, completion status, target values, and dates.
+
+Keep the data format suitable for later spreadsheet import.
+
+## 12. Notifications and Reminders
+
+Implement:
+- In-app notifications.
+- Configurable reminder preferences.
+- Optional per-habit reminder times.
+- Notification history and read/unread status.
+- Enable/disable controls.
+
+For browser push notifications, implement the required permission flow and service-worker support only if compatible with the deployment environment.
+
+For scheduled reminders, use a reliable server-side scheduling strategy supported by the deployment platform. Do not depend exclusively on a browser tab remaining open.
+
+If reliable background scheduling or email delivery requires an external service, implement a clearly documented integration point and configuration instructions. Never pretend an external notification has been delivered when it has not.
+
+Prevent duplicate reminders and respect each user's local timezone and notification preferences.
+
+## 13. Optional AI Insights
+
+Design an optional AI Insights module that can be enabled when a valid provider API key is configured.
+
+Possible features:
+- Summarize recent performance.
+- Identify changes in consistency.
+- Suggest realistic habit adjustments.
+- Generate a weekly reflection from the user's selected data.
+
+Requirements:
+- AI must not be necessary for core application functionality.
+- Do not expose provider API keys to the frontend.
+- Send only the minimum data necessary.
+- Do not invent historical statistics.
+- Present generated suggestions as optional recommendations, not facts or medical advice.
+- If no AI credentials are configured, show a helpful disabled state rather than breaking the application.
+
+## 14. Authentication and Multi-User Security
+
+Implement secure registration and login.
+
+Requirements:
+- Unique email address per account.
+- Strong password policy.
+- Secure password hashing.
+- Server-managed sessions using an appropriate PostgreSQL-backed session store.
+- HttpOnly cookies, appropriate Secure settings in production, and a suitable SameSite policy.
+- CSRF protection where applicable to the chosen session architecture.
+- Login and registration rate limiting.
+- Input validation and safe error handling.
+- Session expiration and logout.
+- Password reset using short-lived, single-use tokens if an email delivery service is configured.
+- Do not store plaintext passwords or reset tokens.
+- Never expose secrets in logs or client-side code.
+
+### Data isolation
+
+Associate all user-owned records with their owning user.
+
+Enforce authorization on the server for every private read, create, update, delete, export, and report operation.
+
+Never trust a user ID supplied by the browser to determine ownership. Derive the authenticated user from the verified session.
+
+Return an appropriate authorization response when another user's record is requested.
+
+Test cross-user access attempts explicitly.
+
+Do not ship a default admin password, shared demo credentials, or an open endpoint that returns all users' private data.
+
+## 15. Suggested Database Schema
+
+Design normalized, indexed PostgreSQL tables. Adjust the exact schema when necessary, but preserve these relationships and behaviors.
+
+### users
+- id
+- name
+- email
+- password_hash or reference to the chosen authentication provider
+- timezone
+- week_start_preference
+- created_at
+- updated_at
+
+### user_settings
+- id
+- user_id
+- theme
+- locale
+- notification_preferences
+- reminder_preferences
+- created_at
+- updated_at
+
+### habits
+- id
+- user_id
+- name
+- description
+- category
+- icon
+- color
+- habit_type
+- schedule_type
+- schedule_config
+- target_value
+- target_unit
+- start_date
+- end_date
+- reminder_time
+- completion_deadline
+- priority
+- display_order
+- status
+- created_at
+- updated_at
+- archived_at
+
+### habit_logs
+- id
+- user_id
+- habit_id
+- local_date
+- completed
+- numeric_value
+- duration_seconds
+- notes
+- completed_at
+- created_at
+- updated_at
+
+Enforce an appropriate unique constraint on each habit's user-owned local-date entry so duplicate records cannot be created by repeated requests. Choose the exact key based on the supported tracking model.
+
+### goals
+- id
+- user_id
+- habit_id (nullable where the goal is not tied to a single habit)
+- title
+- goal_type
+- target_value
+- target_unit
+- start_date
+- end_date
+- status
+- created_at
+- updated_at
+
+### notifications
+- id
+- user_id
+- habit_id (optional)
+- type
+- title
+- message
+- scheduled_at
+- delivered_at
+- read_at
+- status
+- created_at
+
+### user_sessions
+Use the schema and table structure required by the chosen secure session store.
+
+Add foreign keys, indexes, appropriate cascading behavior, and migration scripts.
+
+Use transactions for operations that modify multiple related records.
+
+Avoid storing derived analytics redundantly unless there is a clear performance need. Prefer calculating metrics from authoritative records, with caching only when necessary and safe.
+
+## 16. Backend API
+
+Implement typed, validated endpoints using a consistent response and error format.
+
+Suggested endpoint groups:
+
+Authentication:
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET /api/auth/me
+- POST /api/auth/forgot-password
+- POST /api/auth/reset-password
+
+Habits:
+- GET /api/habits
+- POST /api/habits
+- GET /api/habits/:id
+- PATCH /api/habits/:id
+- DELETE /api/habits/:id
+- POST /api/habits/:id/archive
+
+Daily tracking:
+- GET /api/tracking/day?date=YYYY-MM-DD
+- GET /api/tracking/range?start=YYYY-MM-DD&end=YYYY-MM-DD
+- PUT /api/habits/:id/logs/:date
+- DELETE /api/habits/:id/logs/:date
+
+Analytics:
+- GET /api/analytics/overview
+- GET /api/analytics/trends
+- GET /api/analytics/habits
+- GET /api/analytics/streaks
+
+Goals:
+- GET /api/goals
+- POST /api/goals
+- PATCH /api/goals/:id
+- DELETE /api/goals/:id
+
+Notifications:
+- GET /api/notifications
+- PATCH /api/notifications/:id/read
+- PATCH /api/notifications/preferences
+
+Exports:
+- GET /api/exports/habits.csv
+- GET /api/exports/logs.csv
+- GET /api/exports/report.csv
+
+Use proper HTTP status codes, server-side validation, pagination where needed, and consistent error responses. Never return password hashes, session secrets, or other sensitive fields.
+
+## 17. Spreadsheet Compatibility and Initial Data
+
+Preserve the spirit of the uploaded spreadsheet's organization:
+
+- Today's Progress.
+- Daily Habits.
+- Daily Progress.
+- Daily Overview.
+- Top Daily Habits.
+- Progress & Streaks.
+- Longest Streaks.
+- Week #1 through Week #5.
+- Goal values.
+- Daily completion history.
+
+Create an optional onboarding import step for users who want to start from an existing spreadsheet.
+
+If direct Excel import is implemented:
+- Parse the workbook on the server.
+- Validate uploaded files and enforce size limits.
+- Map recognizable habit names, goals, dates, and completion values.
+- Preview imported records before saving.
+- Show row-level validation errors.
+- Prevent duplicate imports from silently duplicating historical data.
+- Do not execute workbook macros or treat spreadsheet contents as trusted instructions.
+- Do not silently discard unrecognized data.
+
+The initial 10 habits from my spreadsheet may be offered as an optional starter template for my account, but do not automatically assign my personal routine to every registered user.
+
+Starter habits:
+1. Wake Up at 5:00 AM
+2. Morning Walk From 5:30 AM to 6:30 AM
+3. Reach the office by 8:00 AM
+4. Maintain a To-Do List at the Office
+5. Finish Office Work by 6:00 PM
+6. Return Home by 6:30 PM
+7. Get Fresh and Go To Gym by 7:00 PM
+8. Finish Gym by 8:00 PM to 8:30 PM
+9. Family Time From 9:00 PM to 10:00 PM
+10. Go to Sleep by 10:30 PM
+
+Do not fabricate completed historical entries during import or onboarding.
+
+## 18. Settings and Profile
+
+Provide:
+- Profile name and email.
+- Timezone selector.
+- Week-start preference.
+- Theme preference.
+- Notification preferences.
+- Default dashboard date range.
+- Export personal data.
+- Account deletion flow with explicit confirmation.
+
+Ensure account deletion follows a documented data-retention policy and safely removes or anonymizes associated private records as intended.
+
+The app may default to the requested dark theme, but avoid making the interface unusable if the user changes preferences.
+
+## 19. Performance and Maintainability
+
+- Use reusable, typed components.
+- Separate UI components, business logic, API handlers, validation schemas, and database queries.
+- Keep calculations in centralized, testable services.
+- Avoid unnecessary requests and duplicate database queries.
+- Add appropriate indexes.
+- Paginate large result sets.
+- Use loading skeletons and optimistic updates only with rollback on failure.
+- Ensure frontend state remains consistent with server responses.
+- Provide useful logs without exposing sensitive personal information.
+- Include a README, environment variable documentation, database migration instructions, and deployment instructions.
+- Do not use localStorage as the authoritative database for habit history.
+- Avoid giant single-file implementations.
+- Do not leave core features as TODOs or mock API calls.
+
+## 20. Testing and Acceptance Criteria
+
+Write and run automated tests for critical behavior.
+
+### Authentication
+- Registration works.
+- Duplicate email registration is rejected.
+- Correct login works.
+- Incorrect login is rejected.
+- Logout invalidates the session.
+- Private pages and endpoints require authentication.
+
+### Multi-user isolation
+- User A cannot view User B's habits.
+- User A cannot modify or delete User B's logs.
+- User A cannot access User B's analytics, goals, or exports.
+- Changing a record ID or URL cannot bypass ownership checks.
+
+### Tracking logic
+- Completing a habit persists after refresh.
+- Undoing a completion updates statistics correctly.
+- Duplicate daily logs are prevented.
+- Unscheduled days do not count as missed occurrences.
+- Future dates are not treated as missed.
+- Historical corrections recalculate affected statistics.
+- Count-based and duration-based habits use their configured targets.
+- Zero eligible habits do not produce NaN or division-by-zero errors.
+
+### Calendar and streaks
+- February, leap years, and 30-/31-day months render correctly.
+- Week #1 through Week #5 are calculated from the actual calendar and configured week start.
+- Current and longest streaks follow the documented schedule-aware rules.
+- Historical edits and timezone settings do not produce inconsistent dates.
+
+### UI and usability
+- Main pages work on desktop, tablet, and mobile.
+- No horizontal overflow on small screens.
+- Forms validate correctly.
+- Loading, empty, success, and error states work.
+- Charts use real data and correct date ranges.
+- Navigation and keyboard accessibility are usable.
+
+### Persistence and deployment
+- PostgreSQL migrations run successfully.
+- Data survives server restarts.
+- Missing secrets produce helpful configuration errors.
+- Production builds complete successfully.
+- No core feature depends on mock data.
+
+Do not claim tests passed unless they were actually executed.
+
+## 21. Development Workflow
+
+Work in the following order:
+
+Phase 1: Inspect the project, establish the architecture, configure PostgreSQL, and create database migrations.
+
+Phase 2: Implement authentication, session management, user isolation, and onboarding.
+
+Phase 3: Build the design system, responsive layout, navigation, and dashboard shell.
+
+Phase 4: Implement habit CRUD, schedules, daily logs, and calendar tracking.
+
+Phase 5: Implement centralized completion calculations, streaks, goals, and historical corrections.
+
+Phase 6: Implement analytics, reports, CSV exports, and notifications.
+
+Phase 7: Add optional AI insights and spreadsheet import where supported.
+
+Phase 8: Run tests, fix errors, review accessibility, verify security boundaries, and prepare deployment.
+
+After each phase, verify that the application runs before continuing.
+
+Do not stop after generating a plan. Implement the application and validate the working result.
+
+If a required integration cannot be completed because credentials or an external service are missing, implement the safe integration boundary, document the exact configuration needed, and continue building the rest of the application.
+
+## 22. Definition of Done
+
+The project is ready for review only when:
+
+- A new user can register, log in, and log out.
+- Users have isolated private data.
+- Users can create and manage habits.
+- Daily completion persists in PostgreSQL.
+- Calendar navigation and historical logs work.
+- Daily, weekly, and monthly metrics are calculated correctly.
+- Current and longest streaks follow tested rules.
+- Goals, analytics, and CSV exports work.
+- Responsive layouts and accessible interactions are implemented.
+- Critical automated tests have been run and their actual results reported.
+- Setup, secrets, migrations, and deployment instructions are documented.
+
+Start by inspecting the current Replit workspace, then implement the project in manageable phases. Make reasonable engineering decisions without asking me to approve every small implementation detail. Clearly report any genuine blocker or external credential requirement.

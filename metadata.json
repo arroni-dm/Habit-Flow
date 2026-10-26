@@ -1,0 +1,6 @@
+{
+  "name": "HabitFlow",
+  "description": "Personal productivity and multi-user habit tracking platform with daily schedules, streak analytics, goal tracking, weekly reviews, and CSV exports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

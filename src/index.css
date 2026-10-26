@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #0B0D0B;
+  --bg-panel: #121512;
+  --bg-surface: #191D18;
+  --bg-surface-hover: #212620;
+  --text-primary: #F5F7F2;
+  --text-secondary: #9BA397;
+  --text-muted: #6E776B;
+  --border-subtle: #232922;
+  --border-strong: #313930;
+  --accent-lime: #C6FF00;
+  --accent-lime-hover: #D4FF38;
+  --accent-ink: #0B0D0B;
+  --status-success: #4ADE80;
+  --status-warning: #FBBF24;
+  --status-danger: #F87171;
+  --font-display: 'Plus Jakarta Sans', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+  --font-sans: 'DM Sans', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+html.light {
+  --bg-canvas: #F5F7F4;
+  --bg-panel: #FFFFFF;
+  --bg-surface: #EEF2EC;
+  --bg-surface-hover: #E3E9E0;
+  --text-primary: #111611;
+  --text-secondary: #4C5649;
+  --text-muted: #6C7669;
+  --border-subtle: #DCE3D9;
+  --border-strong: #C5CFC1;
+  --accent-lime: #65A30D;
+  --accent-lime-hover: #4D7C0F;
+  --accent-ink: #FFFFFF;
+  --status-success: #15803D;
+  --status-warning: #B45309;
+  --status-danger: #DC2626;
+}
+
+@layer base {
+  html,
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    outline: none;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--accent-lime);
+    outline-offset: 2px;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

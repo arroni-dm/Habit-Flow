@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        function ensureWritableFetch() {
+          try {
+            var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
+            if (desc && typeof desc.get === 'function' && typeof desc.set !== 'function' && desc.configurable !== false) {
+              var origGet = desc.get;
+              var assignedFetch = null;
+              Object.defineProperty(window, 'fetch', {
+                configurable: true,
+                enumerable: desc.enumerable !== false,
+                get: function () {
+                  return assignedFetch || origGet.call(window);
+                },
+                set: function (fn) {
+                  if (typeof fn === 'function') {
+                    assignedFetch = fn;
+                  }
+                },
+              });
+            }
+          } catch (_err) {}
+        }
+        ensureWritableFetch();
+        document.addEventListener('readystatechange', ensureWritableFetch);
+        window.addEventListener(
+          'error',
+          function (event) {
+            var src = String((event && event.filename) || '');
+            var msg = String((event && event.message) || '');
+            if (
+              src.indexOf('chrome-extension://') === 0 ||
+              src.indexOf('moz-extension://') === 0 ||
+              msg.indexOf('Cannot set property fetch of #<Window>') !== -1
+            ) {
+              event.stopImmediatePropagation();
+              event.preventDefault();
+            }
+          },
+          true
+        );
+      })();
+    </script>
+    <title>HabitFlow</title>
+    <meta name="description" content="Personal productivity and multi-user habit tracking platform with daily schedules, streak analytics, goal tracking, weekly reviews, and CSV exports." />
+    <meta property="og:title" content="HabitFlow" />
+    <meta property="og:description" content="Personal productivity and multi-user habit tracking platform with daily schedules, streak analytics, goal tracking, weekly reviews, and CSV exports." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
