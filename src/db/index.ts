@@ -135,7 +135,10 @@ export async function closeDatabase(): Promise<void> {
 
 export function getDbContext(): ManagedDbContext {
   if (!globalThis.__habitflowDbContext) {
-    globalThis.__habitflowDbContext = createManagedDatabase();
+    const isVercel = process.env.VERCEL === '1';
+    globalThis.__habitflowDbContext = createManagedDatabase({
+      inMemory: isVercel || undefined
+    });
   }
   return globalThis.__habitflowDbContext;
 }
