@@ -62,9 +62,27 @@ export function createManagedDatabase(options?: {
     };
   }
 
-  const configuredDir = options?.dataDir ?? process.env.PGDATA_DIR?.trim() ?? './data/pgdata';
-  const resolvedDir = path.resolve(process.cwd(), configuredDir);
+  // Vercel Serverless environment check
+  const isVercel = process.env.VERCEL === '1';
+  const configuredDir = options?.dataDir ?? process.env.PGDATA_DIR?.trim() ?? (isVercel ? '/tmp/pgdata' : './data/pgdata');
+  const resolvedDir = isVercel ? configuredDir : path.resolve(process.cwd(), configuredDir);
+
   fs.mkdirSync(path.dirname(resolvedDir), { recursive: true });
+
+  // Vercel serverless instance handling (Bypass strict file lock for /tmp)
+  if (isVercel) {
+    const client = new PGlite(resolvedDir);
+    const db = drizzlePglite(client, { schema }) as unknown as AppDatabase;
+    return {
+      db,
+      rawExec: async (sqlText: string) => {
+        await client.exec(sqlText);
+      },
+      close: async () => {
+        await client.close();
+      },
+    };
+  }
 
   const lockPath = `${resolvedDir}.lock`;
   const owner = String(process.pid);
