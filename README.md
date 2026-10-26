@@ -94,6 +94,12 @@ Copy `.env.example` to `.env` for local configuration:
    npm run dev
    ```
 
+   Use the full-stack server at http://localhost:3000 for account creation and
+   login. A static file server cannot run the `/api` routes. `npm run preview`
+   builds the frontend and starts the full-stack production server on port 3000.
+   If running Vite separately, keep `npm run dev` running as the API server;
+   Vite forwards `/api` requests to it.
+
 4. **Typecheck, test & production build**:
    ```bash
    npm run lint

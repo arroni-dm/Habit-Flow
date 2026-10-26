@@ -66,6 +66,33 @@ export function createManagedDatabase(options?: {
   const resolvedDir = path.resolve(process.cwd(), configuredDir);
   fs.mkdirSync(path.dirname(resolvedDir), { recursive: true });
 
+  const lockPath = `${resolvedDir}.lock`;
+  const owner = String(process.pid);
+  try {
+    fs.writeFileSync(lockPath, owner, { flag: 'wx' });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    const existingPid = Number(fs.readFileSync(lockPath, 'utf8'));
+    if (!Number.isSafeInteger(existingPid) || existingPid <= 0) {
+      throw new Error(`Invalid database lock: ${lockPath}. Inspect it before restarting.`);
+    }
+    try {
+      process.kill(existingPid, 0);
+    } catch (probeError) {
+      if ((probeError as NodeJS.ErrnoException).code !== 'ESRCH') throw probeError;
+      fs.unlinkSync(lockPath);
+      fs.writeFileSync(lockPath, owner, { flag: 'wx' });
+    }
+    if (fs.readFileSync(lockPath, 'utf8') !== owner) {
+      throw new Error(`Database is already open in process ${existingPid}. Stop the other HabitFlow server first.`);
+    }
+  }
+  const releaseLock = () => {
+    if (fs.existsSync(lockPath) && fs.readFileSync(lockPath, 'utf8') === owner) {
+      fs.unlinkSync(lockPath);
+    }
+  };
+  process.once('exit', releaseLock);
   const client = new PGlite(resolvedDir);
   const db = drizzlePglite(client, { schema }) as unknown as AppDatabase;
 
@@ -76,8 +103,16 @@ export function createManagedDatabase(options?: {
     },
     close: async () => {
       await client.close();
+      releaseLock();
+      process.removeListener('exit', releaseLock);
     },
   };
+}
+
+export async function closeDatabase(): Promise<void> {
+  await globalThis.__habitflowDbContext?.close();
+  globalThis.__habitflowDbContext = undefined;
+  globalThis.__habitflowMigrated = undefined;
 }
 
 export function getDbContext(): ManagedDbContext {
