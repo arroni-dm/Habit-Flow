@@ -88,7 +88,7 @@ export async function apiFetch<T = any>(
   } catch (error) {
     if (options.signal?.aborted) throw error;
     throw new ApiError(
-      'Cannot reach the HabitFlow server. Keep npm run dev running in your terminal, open http://localhost:3000, and try again.',
+      'Cannot reach the HabitFlow server. Please check your network connection or server status.',
       0
     );
   }

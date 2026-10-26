@@ -11,11 +11,22 @@ if (process.argv.includes('--production')) {
   process.env.NODE_ENV = 'production';
 }
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// 1. Database lazy-loader setup for Serverless / Vercel compatibility
+let dbPromise: ReturnType<typeof ensureDatabaseReady> | null = null;
+function getDb() {
+  if (!dbPromise) {
+    dbPromise = ensureDatabaseReady();
+  }
+  return dbPromise;
+}
+
+// 2. Export app at module level so Vercel & Node can read it directly
+const app = createApp(getDb);
 
 async function startServer() {
-  const db = await ensureDatabaseReady();
-  const app = createApp(async () => db);
+  const db = await getDb();
   let closeVite: (() => Promise<void>) | undefined;
 
   // Run server-side background reminder evaluation every 60 seconds
@@ -43,6 +54,7 @@ async function startServer() {
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`HabitFlow server listening on http://localhost:${PORT}`);
   });
+
   let shuttingDown = false;
   const shutdown = async (exitCode = 0) => {
     if (shuttingDown) return;
@@ -58,15 +70,21 @@ async function startServer() {
       process.exit(1);
     }
   };
+
   process.once('SIGINT', () => void shutdown());
   process.once('SIGTERM', () => void shutdown());
   server.on('error', (error) => {
-    console.error('Unable to listen on port 3000. Stop any other HabitFlow server.', error.message);
+    console.error(`Unable to listen on port ${PORT}. Stop any other HabitFlow server.`, error.message);
     void shutdown(1);
   });
 }
 
-startServer().catch((err) => {
-  console.error('Fatal server startup error:', err);
-  process.exit(1);
-});
+// Local dev Server start (Vercel automatic export default handle korbe)
+if (process.env.VERCEL !== '1') {
+  startServer().catch((err) => {
+    console.error('Fatal server startup error:', err);
+    process.exit(1);
+  });
+}
+
+export default app;
