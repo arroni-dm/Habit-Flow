@@ -77,12 +77,21 @@ export async function apiFetch<T = any>(
     headers.set('x-csrf-token', memoryCsrfToken);
   }
 
-  const response = await fetch(path, {
-    ...options,
-    method,
-    headers,
-    credentials: 'include',
-  });
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      ...options,
+      method,
+      headers,
+      credentials: 'include',
+    });
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
+    throw new ApiError(
+      'Cannot reach the HabitFlow server. Keep npm run dev running in your terminal, open http://localhost:3000, and try again.',
+      0
+    );
+  }
 
   if (!response.ok) {
     let message = `Request failed (${response.status})`;
