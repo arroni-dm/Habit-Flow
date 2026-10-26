@@ -7,6 +7,10 @@ import { runGlobalReminderSweep } from './src/server/reminders.ts';
 
 dotenv.config();
 
+if (process.argv.includes('--production')) {
+  process.env.NODE_ENV = 'production';
+}
+
 const PORT = 3000;
 
 async function startServer() {

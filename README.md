@@ -71,9 +71,17 @@ Copy `.env.example` to `.env` for local configuration:
 ## Local Setup, Migrations & Running
 
 1. **Install dependencies**:
+   Use Node.js 22.12 or newer. In PowerShell, run:
    ```bash
    npm install
    ```
+
+   Optionally copy the local configuration before starting (PowerShell):
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+   Core tracking works without API keys or an external database. Open
+   http://localhost:3000 after starting the server. Stop it with Ctrl+C.
 
 2. **Database migrations**:
    Versioned SQL migrations live in `./drizzle/` and are automatically and idempotently applied on server startup via `ensureDatabaseReady()` (`__habitflow_migrations` tracking table). To generate new migrations after editing `src/db/schema.ts`:
